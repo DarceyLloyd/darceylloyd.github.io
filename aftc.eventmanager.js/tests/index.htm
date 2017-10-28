@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Darcey@AllForTheCode.co.uk</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+        }
+
+        td {
+            vertical-align: top;
+            padding: 10px;
+        }
+
+        .box {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #000000;
+        }
+
+
+        #out {
+            max-height: 200px;
+            overflow: auto;
+        }
+
+        input,
+        button,
+        select {
+            box-sizing: border-box;
+            display: block;
+            width: 200px;
+        }
+
+        .input-title {
+            margin: 3px 0 3px 0;
+            padding: 0;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+
+
+        .form-box {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #000000;
+            background: #CCCCCC;
+        }
+
+        .form-box h1 {
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+        }
+    </style>
+    <script src="../node_modules/aftc.js/src/debug.js"></script>
+    <script src="../src/AFTC.EventManager.js"></script>
+    <script>
+
+        // Global var defs
+        var myEventManager;
+
+
+        function init() {
+            log("Darcey@AllForTheCode.co.uk");
+
+            // Dispatch Event Functions
+            function testFunction1() {
+                var msg = "testFunction1()";
+                //log(msg);
+                msg += "<br>";
+                logTo("out",msg);
+            }
+            function testFunction2() {
+                var msg = "testFunction2()";
+                //log(msg);
+                msg += "<br>";
+                logTo("out",msg);
+            }
+            function testFunction3() {
+                var msg = "testFunction3()";
+                //log(msg);
+                msg += "<br>";
+                logTo("out",msg);
+            }
+            function testFunction4() {
+                var msg = "testFunction4()";
+                //log(msg);
+                msg += "<br>";
+                logTo("out",msg);
+            }
+
+
+            // Setup the AFTC.EventManager
+            myEventManager = new AFTC.EventManager();
+
+            // Add some events to it
+            myEventManager.add("TestEvent 1",testFunction1);
+            myEventManager.add("TestEvent 2",testFunction2);
+            myEventManager.add("TestEvent 3",testFunction3);
+            myEventManager.add("TestEvent 4",testFunction4);
+
+
+            //myEventManager.dispatch("TestEvent 1");
+            //myEventManager.remove("TestEvent 1");
+            //myEventManager.removeAll();
+            //myEventManager.dispatch("TestEvent 1");
+            //log(myEventManager.getEvents());
+
+            // Tests
+            //var e1 = myEventManager.getEventById("TestEvent 1");
+            //window.logTo("out",e1);
+
+            //myEventManager.remove("TestEvent 2");
+
+            //myEventManager.dispatch("TestEvent 1");
+            //myEventManager.dispatch("TestEvent 2");
+
+            updateLists();
+        }
+
+
+        function updateLists() {
+            var events = myEventManager.getEvents();
+
+            removeSelectOptions("evtIdRemove");
+            removeSelectOptions("evtIdDispatch");
+
+            var removeSelect = document.getElementById("evtIdRemove");
+            var dispatchSelect = document.getElementById("evtIdDispatch");
+            var msg = "";
+
+            for (var index in events){
+                //log(events[index]);
+                var option = document.createElement("option");
+                var e = events[index];
+                option.text = e.id;
+                option.value = e.id;
+
+                removeSelect.add(option);
+                msg += "Event at index [" + index + "] = " + e.id + "<br>";
+            }
+
+            document.getElementById("out2").innerHTML = msg;
+
+            var options = removeSelect.innerHTML;
+            dispatchSelect.innerHTML = options;
+        }
+
+
+
+
+        window.removeSelectOptions = function (selectBoxId) {
+            var i,
+                element = document.getElementById(selectBoxId);
+
+            if (element) {
+                for (i = element.options.length - 1; i >= 0; i--) {
+                    element.remove(i);
+                }
+            }
+        }
+
+
+
+        function btnDispatchEvent(){
+            var dispatchSelect = document.getElementById("evtIdDispatch");
+            if (dispatchSelect.selectedIndex == -1){
+                alert("Select an event to dispatch first!");
+                return false;
+            }
+            var eventName = dispatchSelect[dispatchSelect.selectedIndex].value;
+            if (eventName){
+                myEventManager.dispatch(eventName);
+            }
+        }
+
+        function btnAddEvent(){
+            var newEventId = document.getElementById("newEventId").value;
+            if (newEventId.length < 1){
+                alert("Please make sure your new events id's are 1 or more characters!");
+                return false;
+            }
+            //log(newEventId);
+            var me = this;
+            myEventManager.add(newEventId,function(){
+                var msg = "EventID: [" + newEventId + "]: Executed.";
+                //log(msg);
+                msg += "<br>";
+                logTo("out",msg);
+            })
+
+            updateLists();
+        }
+
+        function btnRemoveEvent(){
+            var removeSelect = document.getElementById("evtIdRemove");
+            if (removeSelect.selectedIndex == -1){
+                alert("Select something to remove first!");
+                return false;
+            }
+            var eventName = removeSelect[removeSelect.selectedIndex].value;
+            myEventManager.remove(eventName);
+            updateLists();
+        }
+
+        function btnRemoveAllEvents(){
+            myEventManager.removeAll();
+            updateLists();
+        }
+
+    </script>
+</head>
+
+<body onload="init()">
+    <table>
+        <tr>
+            <td>
+                <div class="form-box">
+                    <h1>Add</h1>
+                    <h2 class="input-title">eventId:</h2>
+                    <input type="text" id="newEventId" name="newEventId" />
+                    <h2 class="input-title">dispatchFunction:</h2>
+                    <input type="text" id="evtDispatchFunction" name="evtDispatchFunction" value="function(){ log('eventId executed'); }" disabled/>
+                    <button onclick="btnAddEvent()">Add Event</button>
+                </div>
+            </td>
+            <td>
+                <div class="form-box">
+                    <h1>Remove</h1>
+                    <h2 class="input-title">eventId's:</h2>
+                    <select id="evtIdRemove" name="evtIdRemove" size="5">
+                        <option value="evtId">item 1</option>
+                        <option value="evtId">item 2</option>
+                        <option value="evtId">item 3</option>
+                    </select>
+                    <button onclick="btnRemoveEvent()">Remove selected</button>
+                    <button onclick="btnRemoveAllEvents()">REMOVE ALL</button>
+                </div>
+            </td>
+            <td>
+                <div class="form-box">
+                    <h1>Dispatch</h1>
+                    <h2 class="input-title">eventId's:</h2>
+                    <select id="evtIdDispatch" name="evtIdDispatch" size="5">
+                        <option value="evtId">item 1</option>
+                        <option value="evtId">item 2</option>
+                        <option value="evtId">item 3</option>
+                    </select>
+                    <button onclick="btnDispatchEvent()">Dispatch selected event</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <h4>Debug (out)</h4>
+    <div id="out" class="box"></div>
+    <h4>AFTC.EventManager.js Events that have been setup: (out2)</h4>
+    <div id="out2" class="box"></div>
+</body>
+
+</html>
