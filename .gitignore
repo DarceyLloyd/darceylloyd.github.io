@@ -1,12 +1,10 @@
-.css
-.js
-.json
-.xml
-
 # OS generated files #
 ######################
 vendor
 node_modules
+ig-*
+
+
 
 # OS generated files #
 ######################
